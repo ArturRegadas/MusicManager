@@ -87,10 +87,14 @@ pub fn scan_music_folder(root: String) -> Vec<Artist> {
                     album_year = tag.year();
                 }
 
+                // Preencher todos os campos exigidos pela struct Track
                 tracks.push(Track {
+                    id: 0, // sem id até inserir no DB
+                    album_id: 0, // será preenchido ao inserir o álbum no DB
                     number,
                     title,
                     duration: None,
+                    path: path.to_string_lossy().to_string(),
                 });
             }
 
@@ -101,7 +105,10 @@ pub fn scan_music_folder(root: String) -> Vec<Artist> {
 
             tracks.sort_by_key(|t| t.number);
 
+            // Preencher todos os campos exigidos pela struct Album
             albums.push(Album {
+                id: 0, // sem id até inserir no DB
+                artist_id: 0, // será preenchido ao inserir o artista no DB
                 title: album_title,
                 year: album_year,
                 image: None,
@@ -113,8 +120,11 @@ pub fn scan_music_folder(root: String) -> Vec<Artist> {
             continue;
         }
 
+        // Preencher todos os campos exigidos pela struct Artist
         artists.push(Artist {
+            id: 0, // sem id até inserir no DB
             name: artist_name,
+            image: None,
             albums,
         });
     }

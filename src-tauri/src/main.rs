@@ -3,6 +3,7 @@
 
 mod music;
 mod commands;
+mod db;
 
 fn main() {
     tauri::Builder::default()

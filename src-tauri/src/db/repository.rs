@@ -1,5 +1,4 @@
 use rusqlite::{params, Connection};
-use crate::music::models::*;
 
 pub fn insert_artist(conn: &Connection, name: &str) -> i64 {
     conn.execute(
