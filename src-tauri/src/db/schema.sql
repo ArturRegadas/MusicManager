@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS artists (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  image TEXT
+);
+
+CREATE TABLE IF NOT EXISTS albums (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  artist_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  year INTEGER,
+  image TEXT,
+  UNIQUE (artist_id, title),
+  FOREIGN KEY (artist_id) REFERENCES artists(id)
+);
+
+CREATE TABLE IF NOT EXISTS tracks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  album_id INTEGER NOT NULL,
+  number INTEGER,
+  title TEXT NOT NULL,
+  duration INTEGER,
+  path TEXT NOT NULL UNIQUE,
+  FOREIGN KEY (album_id) REFERENCES albums(id)
+);
