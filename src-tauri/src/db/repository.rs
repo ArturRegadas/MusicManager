@@ -17,11 +17,12 @@ pub fn insert_album(
     conn: &Connection,
     artist_id: i64,
     title: &str,
-    year: Option<i32>,
-    image: &str
+    year: Option<u32>,
+    image: Option<&str>,
 ) -> i64 {
     conn.execute(
-        "INSERT OR IGNORE INTO albums (artist_id, title, year, image) VALUES (?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO albums (artist_id, title, year, image)
+         VALUES (?, ?, ?, ?)",
         params![artist_id, title, year, image],
     ).unwrap();
 
@@ -31,6 +32,7 @@ pub fn insert_album(
         |row| row.get(0),
     ).unwrap()
 }
+
 
 pub fn insert_track(
     conn: &Connection,
@@ -45,3 +47,5 @@ pub fn insert_track(
         params![album_id, number, title, path],
     ).ok();
 }
+
+

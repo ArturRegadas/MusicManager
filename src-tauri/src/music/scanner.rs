@@ -1,32 +1,30 @@
+use crate::db::repository::*;
+use crate::db::connection::open_db;
+
 use std::fs;
 use walkdir::WalkDir;
 use lofty::{Probe, TaggedFileExt, Accessor};
 
-use super::models::{Artist, Album, Track};
-
 const AUDIO_EXTENSIONS: [&str; 5] = ["mp3", "flac", "ogg", "m4a", "wav"];
 
-pub fn scan_music_folder(root: String) -> Vec<Artist> {
+pub fn scan_music_folder(root: String) {
     println!("ROOT: {}", root);
 
-    let mut artists = Vec::new();
+    let conn = open_db().expect("failed to open database");
 
     let Ok(artist_dirs) = fs::read_dir(&root) else {
         println!("ERROR: cannot read root directory");
-        return artists;
+        return;
     };
 
     for artist_dir in artist_dirs.flatten() {
         let artist_path = artist_dir.path();
-
         if !artist_path.is_dir() {
             continue;
         }
 
         let artist_name = artist_dir.file_name().to_string_lossy().to_string();
-        println!("ARTIST: {}", artist_name);
-
-        let mut albums = Vec::new();
+        let artist_id = insert_artist(&conn, &artist_name);
 
         let Ok(album_dirs) = fs::read_dir(&artist_path) else {
             continue;
@@ -34,29 +32,30 @@ pub fn scan_music_folder(root: String) -> Vec<Artist> {
 
         for album_dir in album_dirs.flatten() {
             let album_path = album_dir.path();
-
             if !album_path.is_dir() {
                 continue;
             }
 
             let album_title = album_dir.file_name().to_string_lossy().to_string();
-            println!("  ALBUM: {}", album_title);
 
-            let mut tracks = Vec::new();
             let mut album_year: Option<u32> = None;
+            let mut tracks: Vec<(u32, String, String)> = Vec::new();
 
-            for entry in WalkDir::new(&album_path).into_iter().filter_map(Result::ok) {
+            for entry in WalkDir::new(&album_path)
+                .max_depth(1)
+                .into_iter()
+                .filter_map(|e| e.ok())
+            {
                 if !entry.file_type().is_file() {
                     continue;
                 }
 
                 let path = entry.path();
 
-                let ext = path
-                    .extension()
-                    .and_then(|e| e.to_str())
-                    .map(|e| e.to_lowercase())
-                    .unwrap_or_default();
+                let ext = match path.extension().and_then(|e| e.to_str()) {
+                    Some(e) => e.to_lowercase(),
+                    None => continue,
+                };
 
                 if !AUDIO_EXTENSIONS.contains(&ext.as_str()) {
                     continue;
@@ -87,47 +86,28 @@ pub fn scan_music_folder(root: String) -> Vec<Artist> {
                     album_year = tag.year();
                 }
 
-                // Preencher todos os campos exigidos pela struct Track
-                tracks.push(Track {
-                    id: 0, // sem id até inserir no DB
-                    album_id: 0, // será preenchido ao inserir o álbum no DB
+                tracks.push((
                     number,
                     title,
-                    duration: None,
-                    path: path.to_string_lossy().to_string(),
-                });
+                    path.to_string_lossy().to_string(),
+                ));
             }
 
             if tracks.is_empty() {
-                println!("    (album ignorado, sem músicas)");
                 continue;
             }
 
-            tracks.sort_by_key(|t| t.number);
+            let album_id = insert_album(
+                &conn,
+                artist_id,
+                &album_title,
+                album_year,
+                None,
+            );
 
-            // Preencher todos os campos exigidos pela struct Album
-            albums.push(Album {
-                id: 0, // sem id até inserir no DB
-                artist_id: 0, // será preenchido ao inserir o artista no DB
-                title: album_title,
-                year: album_year,
-                image: None,
-                tracks,
-            });
+            for (number, title, path) in tracks {
+                insert_track(&conn, album_id, number, &title, &path);
+            }
         }
-
-        if albums.is_empty() {
-            continue;
-        }
-
-        // Preencher todos os campos exigidos pela struct Artist
-        artists.push(Artist {
-            id: 0, // sem id até inserir no DB
-            name: artist_name,
-            image: None,
-            albums,
-        });
     }
-
-    artists
 }
