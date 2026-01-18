@@ -15,7 +15,7 @@ export function Player() {
   }
 
   return (
-    <Glass className="fixed bottom-4 left-4 right-4 h-28 flex items-center gap-6 px-6">
+    <Glass className="absolute bottom-4 left-4 right-4 h-28 flex items-center gap-6 px-6 z-40">
       <img
         src="https://picsum.photos/100"
         className="w-20 h-20 rounded-xl object-cover"

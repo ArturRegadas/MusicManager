@@ -18,7 +18,7 @@ export function Sidebar({ open, onToggle, search, onSearchChange }: SidebarProps
 
   return (
     <aside
-      className={`flex flex-col transition-all duration-300 ${
+      className={`absolute left-0 top-0 bottom-0 z-30 flex flex-col transition-all duration-300 ${
         open ? "w-64 p-6" : "w-16 p-2"
       } bg-black/50 backdrop-blur-2xl border-r border-white/10 shadow-lg`}
     >

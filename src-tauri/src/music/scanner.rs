@@ -3,17 +3,14 @@ use crate::db::connection::open_db;
 
 use std::fs;
 use walkdir::WalkDir;
-use lofty::{Probe, TaggedFileExt, Accessor};
+use lofty::{Probe, TaggedFileExt, Accessor, AudioFile};
 
 const AUDIO_EXTENSIONS: [&str; 5] = ["mp3", "flac", "ogg", "m4a", "wav"];
 
 pub fn scan_music_folder(root: String) {
-    println!("ROOT: {}", root);
-
     let conn = open_db().expect("failed to open database");
 
     let Ok(artist_dirs) = fs::read_dir(&root) else {
-        println!("ERROR: cannot read root directory");
         return;
     };
 
@@ -39,25 +36,21 @@ pub fn scan_music_folder(root: String) {
             let album_title = album_dir.file_name().to_string_lossy().to_string();
 
             let mut album_year: Option<u32> = None;
-            let mut tracks: Vec<(u32, String, String)> = Vec::new();
+            let mut tracks: Vec<(u32, String, String, u32)> = Vec::new();
 
-            for entry in WalkDir::new(&album_path)
-                .max_depth(1)
-                .into_iter()
-                .filter_map(|e| e.ok())
-            {
+            for entry in WalkDir::new(&album_path).max_depth(1) {
+                let Ok(entry) = entry else { continue };
                 if !entry.file_type().is_file() {
                     continue;
                 }
 
                 let path = entry.path();
 
-                let ext = match path.extension().and_then(|e| e.to_str()) {
-                    Some(e) => e.to_lowercase(),
-                    None => continue,
+                let Some(ext) = path.extension().and_then(|e| e.to_str()) else {
+                    continue;
                 };
 
-                if !AUDIO_EXTENSIONS.contains(&ext.as_str()) {
+                if !AUDIO_EXTENSIONS.contains(&ext.to_lowercase().as_str()) {
                     continue;
                 }
 
@@ -75,21 +68,24 @@ pub fn scan_music_folder(root: String) {
                     .unwrap_or_else(|| {
                         path.file_stem()
                             .and_then(|s| s.to_str())
-                            .and_then(|s| s.splitn(2, '-').nth(1))
                             .unwrap_or("Unknown")
                             .to_string()
                     });
 
-                let number = tag.track().unwrap_or(0);
+                let track_number = tag.track().unwrap_or(0);
 
                 if album_year.is_none() {
                     album_year = tag.year();
                 }
 
+                let duration_secs =
+                    tagged.properties().duration().as_secs() as u32;
+
                 tracks.push((
-                    number,
+                    track_number,
                     title,
                     path.to_string_lossy().to_string(),
+                    duration_secs,
                 ));
             }
 
@@ -97,16 +93,11 @@ pub fn scan_music_folder(root: String) {
                 continue;
             }
 
-            let album_id = insert_album(
-                &conn,
-                artist_id,
-                &album_title,
-                album_year,
-                None,
-            );
+            let album_id =
+                insert_album(&conn, artist_id, &album_title, album_year, None);
 
-            for (number, title, path) in tracks {
-                insert_track(&conn, album_id, number, &title, &path);
+            for (number, title, path, duration) in tracks {
+                insert_track(&conn, album_id, number, &title, &path, duration);
             }
         }
     }
