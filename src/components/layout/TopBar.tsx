@@ -6,7 +6,7 @@ export function TopBar() {
 
   return (
     <div
-      className="h-10 flex items-center justify-end gap-2 mb-2 select-none"
+      className="h-10 flex items-center justify-end gap-2 mb-4 select-none mt-0"
     >
       <div className="flex-1 h-full"
       onMouseDown={() => mainWindow.startDragging()}></div>

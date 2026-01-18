@@ -7,8 +7,30 @@ html,
 body,
 #root {
   height: 100%;
+  overflow: hidden;
 }
 html, body, #root {
   background: transparent;
 }
 
+
+body {
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+}

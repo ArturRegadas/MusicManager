@@ -55,7 +55,7 @@ pub fn get_library(conn: &Connection) -> Vec<ModelArtist> {
     let mut artists: Vec<ModelArtist> = Vec::new();
 
 
-    let mut stmt = match conn.prepare("SELECT id, name, image FROM artists") {
+    let mut stmt = match conn.prepare("SELECT id, name, image FROM artists order by name") {
         Ok(s) => s,
         Err(e) => {
             println!("Error artists query: {}", e);
