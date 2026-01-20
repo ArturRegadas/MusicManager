@@ -1,21 +1,24 @@
-import { Glass } from "../layout/Glass"
+import React from "react";
+import { ImageWithFallback } from "../ui/ImageWithFallback";
 
-interface AlbumCardProps {
-  cover: string
-  title: string
-  artist: string
-}
+type AlbumProps = {
+  id: number;
+  title: string;
+  artist: string;
+  cover?: string;
+};
 
-export function AlbumCard({ cover, title, artist }: AlbumCardProps) {
+export function AlbumCard({ id, title, artist, cover }: AlbumProps) {
   return (
-    <Glass className="p-3 cursor-pointer hover:scale-105 transform transition">
-      <img
-        src={cover}
-        className="w-36 h-36 rounded-xl mb-3 object-cover flex-shrink-0"
-        alt={title}
-      />
-      <h3 className="font-semibold text-sm leading-tight">{title}</h3>
-      <p className="text-xs text-white/70 mt-1">{artist}</p>
-    </Glass>
-  )
+    <div className="flex flex-col items-start">
+      <div className="w-full aspect-square rounded-lg overflow-hidden bg-white/5">
+        <ImageWithFallback src={cover} alt={title} className="w-full h-full object-cover" />
+      </div>
+
+      <div className="mt-2 w-full">
+        <div className="text-sm font-medium text-white truncate">{title}</div>
+        <div className="text-xs text-white/70 truncate">{artist}</div>
+      </div>
+    </div>
+  );
 }

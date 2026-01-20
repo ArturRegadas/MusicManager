@@ -1,20 +1,21 @@
-import { Button } from "../ui/button"
-import { Search, ChevronLeft, ChevronRight, Settings, Home, Clock, Music } from "lucide-react"
+import { Button } from "../ui/button";
+import { Search, ChevronLeft, ChevronRight, Settings, Home, Clock, Music } from "lucide-react";
 
 type SidebarProps = {
-  open: boolean
-  onToggle: () => void
-  search: string
-  onSearchChange: (value: string) => void
-}
+  open: boolean;
+  onToggle: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
+  onNavigate?: (page: string) => void;
+};
 
-export function Sidebar({ open, onToggle, search, onSearchChange }: SidebarProps) {
+export function Sidebar({ open, onToggle, search, onSearchChange, onNavigate }: SidebarProps) {
   const items = [
-    { icon: Home, label: "Home" },
-    { icon: Music, label: "Library" },
-    { icon: Clock, label: "History" },
-    { icon: Settings, label: "Settings" },
-  ]
+    { icon: Home, label: "Home", id: "home" },
+    { icon: Music, label: "Library", id: "library" },
+    { icon: Clock, label: "History", id: "history" },
+    { icon: Settings, label: "Settings", id: "settings" },
+  ];
 
   return (
     <aside
@@ -48,12 +49,13 @@ export function Sidebar({ open, onToggle, search, onSearchChange }: SidebarProps
             variant="ghost"
             size="sm"
             className={`justify-start ${!open && "justify-center"}`}
+            onClick={() => onNavigate?.(item.id)}
           >
             <item.icon className="w-5 h-5" />
-            {open && <span className="ml-2">{item.label}</span>}
+            {open && <span className="ml-3">{item.label}</span>}
           </Button>
         ))}
       </div>
     </aside>
-  )
+  );
 }
