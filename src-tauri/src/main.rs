@@ -6,7 +6,7 @@ mod commands;
 mod db;
 
 fn main() {
-    tauri::Builder::default()
+    tauri::Builder::default().plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
             commands::load_music_library
         ])

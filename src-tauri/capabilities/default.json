@@ -9,6 +9,27 @@
     "core:window:allow-maximize",
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-dragging",
-    "opener:default"
-  ]
+    "opener:default",
+    "fs:allow-read-file",
+    "fs:allow-read-dir",
+    "fs:read-all",
+    "fs:scope",
+    "fs:scope-home",
+    "fs:scope-audio",
+    "fs:scope-document",
+    {
+      "identifier": "fs:allow-read-file",
+      "scope": ["D:\\**", "C:\\**", "E:\\**"]
+    }
+  ],
+  "scope": {
+    "fs": {
+      "allow": [
+        "C:\\**",
+        "D:\\**",
+        "D:/**",
+        "\\\\?\\D:\\**"
+      ]
+    }
+  }
 }

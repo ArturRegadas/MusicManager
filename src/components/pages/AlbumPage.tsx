@@ -18,18 +18,22 @@ type Album = {
 type Props = {
   album?: Album;
   onPlay?: (track: { title?: string; artist?: string; album?: string; cover?: string; path?: string }) => void;
+  onBack?: () => void;
 };
 
-export function AlbumPage({ album, onPlay }: Props) {
+export function AlbumPage({ album, onPlay, onBack }: Props) {
   if (!album) {
     return <p className="text-white/60">Álbum não encontrado.</p>;
   }
 
   return (
     <div className="p-4">
-      <div className="flex gap-4 items-start">
-        <div className="w-44 h-44 rounded overflow-hidden">
-          <ImageWithFallback src={album.image} alt={album.title} className="w-full h-full object-cover" />
+      <div className="flex gap-4 items-start justify-between">
+        <div className="flex items-center gap-3">
+          {onBack && <button className="px-2 py-1 rounded bg-white/6 hover:bg-white/8" onClick={onBack}>← Voltar</button>}
+          <div className="w-44 h-44 rounded overflow-hidden">
+            <ImageWithFallback src={album.image} alt={album.title} className="w-full h-full object-cover" />
+          </div>
         </div>
 
         <div>
@@ -53,11 +57,7 @@ export function AlbumPage({ album, onPlay }: Props) {
               })
             }
           >
-            <div>
-              <div className="text-sm font-medium text-white">{t.title}</div>
-              <div className="text-xs text-white/70">{t.duration ? `${Math.floor(t.duration / 60)}:${String(t.duration % 60).padStart(2, "0")}` : ""}</div>
-            </div>
-
+            <div className="text-sm text-white">{t.title}</div>
             <div className="text-white/60">▶</div>
           </div>
         ))}

@@ -6,10 +6,10 @@ export function TopBar() {
 
   return (
     <div
-      className="h-10 flex items-center justify-end gap-2 mb-4 select-none mt-0"
+      className="fixed top-0 left-0 right-0 h-10 flex items-center justify-end gap-2 z-50 select-none bg-transparent"
     >
-      <div className="flex-1 h-full"
-      onMouseDown={() => mainWindow.startDragging()}></div>
+      <div className="flex-1 h-full" onMouseDown={() => mainWindow.startDragging()}></div>
+
       <Button size="icon" variant="ghost" onClick={() => mainWindow.minimize()}>
         <span className="text-xl">—</span>
       </Button>

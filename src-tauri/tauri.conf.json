@@ -22,7 +22,13 @@
         "transparent": true
       }
     ],
-    "security": { "csp": null }
+    "security": {
+       "assetProtocol": {
+          "enable": true,
+          "scope": ["D:/**"]
+        },
+       "csp": null 
+    }
   },
   "bundle": {
     "active": true,
