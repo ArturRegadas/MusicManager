@@ -17,6 +17,7 @@
     "fs:scope-home",
     "fs:scope-audio",
     "fs:scope-document",
+    "dialog:allow-open",
     {
       "identifier": "fs:allow-read-file",
       "scope": ["D:\\**", "C:\\**", "E:\\**"]

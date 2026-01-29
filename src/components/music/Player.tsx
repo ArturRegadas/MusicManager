@@ -1,9 +1,10 @@
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Glass } from "../layout/Glass";
 import { ImageWithFallback } from "../ui/ImageWithFallback";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 
 type Track = {
   title?: string;
@@ -15,9 +16,11 @@ type Track = {
 
 type Props = {
   currentTrack?: Track | null;
+  onPrev?: () => void;
+  onNext?: () => void;
 };
 
-export function Player({ currentTrack }: Props) {
+export function Player({ currentTrack, onPrev, onNext }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -44,21 +47,30 @@ export function Player({ currentTrack }: Props) {
     };
   }, []);
 
-  
   useEffect(() => {
     if (!audioRef.current || !currentTrack?.path) return;
 
     try {
-      
       const assetUrl = convertFileSrc(currentTrack.path);
-      
       const audio = audioRef.current;
       audio.src = assetUrl;
       audio.load();
       setProgress(0);
 
-
       audio.play().catch((err) => console.warn("Autoplay bloqueado:", err));
+
+      // registra no histórico (comando Tauri)
+      try {
+        invoke("add_play_history", {
+          title: currentTrack.title ?? "",
+          artist: currentTrack.artist ?? "",
+          album: currentTrack.album ?? null,
+          cover: currentTrack.cover ?? null,
+          path: currentTrack.path ?? ""
+        }).catch(e => console.warn("Não foi possível gravar histórico:", e));
+      } catch (err) {
+        console.warn("Erro ao invocar add_play_history:", err);
+      }
 
     } catch (err) {
       console.error("Erro ao carregar a música via Asset Protocol:", err);
@@ -113,14 +125,24 @@ export function Player({ currentTrack }: Props) {
         </div>
       </div>
 
-      <Button 
-        onClick={togglePlay} 
-        size="icon" 
-        className="w-12 h-12 rounded-full flex-shrink-0"
-        disabled={!currentTrack}
-      >
-        {playing ? <Pause size={24} /> : <Play size={24} fill="currentColor" />}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button onClick={onPrev} size="icon" variant="ghost" className="w-10 h-10" disabled={!currentTrack}>
+          <SkipBack size={18} />
+        </Button>
+
+        <Button 
+          onClick={togglePlay} 
+          size="icon" 
+          className="w-12 h-12 rounded-full flex-shrink-0"
+          disabled={!currentTrack}
+        >
+          {playing ? <Pause size={24} /> : <Play size={24} fill="currentColor" />}
+        </Button>
+
+        <Button onClick={onNext} size="icon" variant="ghost" className="w-10 h-10" disabled={!currentTrack}>
+          <SkipForward size={18} />
+        </Button>
+      </div>
     </Glass>
   );
 }

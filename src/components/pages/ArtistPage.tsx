@@ -17,7 +17,9 @@ type Album = {
 };
 
 type Artist = {
+  id?: number;
   name?: string;
+  image?: string;
   albums?: Album[];
 };
 
@@ -30,6 +32,8 @@ type Props = {
 
 export function ArtistPage({ artist, onOpenAlbum, onPlay, onBack }: Props) {
   if (!artist) return <p className="text-white/60">Artista não encontrado.</p>;
+
+  const artistImage = artist.image ?? (artist.albums?.[0]?.image ?? undefined);
 
   // keep album image as cover for songs when possible
   const topSongs = (artist.albums ?? []).flatMap(a =>
@@ -47,7 +51,12 @@ export function ArtistPage({ artist, onOpenAlbum, onPlay, onBack }: Props) {
           {onBack && (
             <button className="px-2 py-1 rounded bg-white/6 hover:bg-white/8" onClick={onBack}>← Voltar</button>
           )}
-          <h1 className="text-2xl font-bold mb-0">{artist.name}</h1>
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded overflow-hidden bg-white/5">
+              <ImageWithFallback src={artistImage} alt={artist.name} className="w-full h-full object-cover" />
+            </div>
+            <h1 className="text-2xl font-bold mb-0">{artist.name}</h1>
+          </div>
         </div>
       </div>
 

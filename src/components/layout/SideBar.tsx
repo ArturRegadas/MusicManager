@@ -6,10 +6,11 @@ type SidebarProps = {
   onToggle: () => void;
   search: string;
   onSearchChange: (value: string) => void;
+  onSearchSubmit?: (value: string) => void;
   onNavigate?: (page: string) => void;
 };
 
-export function Sidebar({ open, onToggle, search, onSearchChange, onNavigate }: SidebarProps) {
+export function Sidebar({ open, onToggle, search, onSearchChange, onSearchSubmit, onNavigate }: SidebarProps) {
   const items = [
     { icon: Home, label: "Home", id: "home" },
     { icon: Music, label: "Library", id: "library" },
@@ -36,6 +37,12 @@ export function Sidebar({ open, onToggle, search, onSearchChange, onNavigate }: 
           <input
             value={search}
             onChange={e => onSearchChange(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                onSearchSubmit?.(search);
+                onNavigate?.("library");
+              }
+            }}
             placeholder="Search albums..."
             className="bg-transparent flex-1 outline-none text-sm text-white"
           />
