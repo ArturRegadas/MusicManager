@@ -12,7 +12,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::load_music_library,
             commands::add_play_history,
-            commands::get_play_history
+            commands::get_play_history,
+            commands::clear_play_history
         ])
         .run(tauri::generate_context!())
         .unwrap();

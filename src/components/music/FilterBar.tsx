@@ -1,5 +1,3 @@
-import React from "react";
-
 type Filter = "artists" | "albums" | "songs";
 
 type Props = {

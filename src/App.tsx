@@ -11,14 +11,6 @@ import { SongsList } from "./components/music/SongsList";
 import { AlbumPage } from "./components/pages/AlbumPage";
 import { ArtistPage } from "./components/pages/ArtistPage";
 
-// carregar imagems dos artistas e dos albums
-// autoplay quando a musica acabar 
-// arumar albuns 
-// tela principal FIX 
-// apagar hisotrico nao funciona
-// layout (margem e layout das paginas no gera)
-// impedir inspecionar
-// chamadar das apis externas pelo ts ou rust
 
 type Track = {
   title?: string;
@@ -40,7 +32,6 @@ export default function App() {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [playbackHistory, setPlaybackHistory] = useState<Track[]>([]); // histórico local para prev quando necessário
 
-  // carregar path do localStorage ou usar um padrão
   const [libraryPath, setLibraryPath] = useState<string>(() => {
     try {
       return localStorage.getItem("musicLibraryPath") ?? "D:/01_ArturHenrique/Musicas";
@@ -56,7 +47,6 @@ export default function App() {
     if (page !== "artist") setSelectedArtist(null);
   }, [page]);
 
-  // quando tocar uma nova faixa, empurra a atual para playbackHistory
   const playTrack = (track: Track) => {
     setPlaybackHistory(prev => {
       if (currentTrack) {
@@ -68,7 +58,6 @@ export default function App() {
   };
 
   const handlePrev = () => {
-    // tenta voltar dentro do álbum atual (se selectedAlbum estiver definido e currentTrack tiver album)
     if (selectedAlbum && currentTrack?.path) {
       const tracks = selectedAlbum.tracks ?? [];
       const idx = tracks.findIndex((t: any) => t.path === currentTrack.path);
@@ -85,7 +74,7 @@ export default function App() {
       }
     }
 
-    // senão, usar histórico local (última entrada)
+
     setPlaybackHistory(prev => {
       if (!prev.length) return prev;
       const last = prev[prev.length - 1];
@@ -96,7 +85,7 @@ export default function App() {
   };
 
   const handleNext = () => {
-    // tenta pular para próxima faixa do álbum atual
+    
     if (selectedAlbum && currentTrack?.path) {
       const tracks = selectedAlbum.tracks ?? [];
       const idx = tracks.findIndex((t: any) => t.path === currentTrack.path);
@@ -113,9 +102,9 @@ export default function App() {
       }
     }
 
-    // caso não haja próxima no álbum atual, escolhe um álbum aleatório e toca sua primeira faixa
+    
     if (library && library.length > 0) {
-      // constrói array de álbuns com ao menos 1 faixa
+    
       const albumsWithTracks = library.flatMap((artist: any) =>
         (artist.albums ?? []).map((album: any) => ({ album, artistName: artist.name }))
       ).filter((a: any) => (a.album.tracks ?? []).length > 0);
@@ -161,7 +150,7 @@ export default function App() {
     }
   };
 
-  // pesquisa: músicas, artistas, álbuns
+
   const lower = search.trim().toLowerCase();
   const songResults: Track[] = lower
     ? library.flatMap((artist: any) =>
@@ -191,12 +180,12 @@ export default function App() {
   return (
     <>
       <TopBar />
-      <div className="min-h-screen w-full flex justify-center overflow-y-auto pb-40 pt-10" style={{
+      <div className="min-h-screen w-full flex justify-center overflow-y-auto pb-40 pt-0 mt-0" style={{
         background: "linear-gradient(135deg, rgba(45,45,48,0.9), rgba(75,80,85,0.75))",
         backdropFilter: "blur(18px)",
         WebkitBackdropFilter: "blur(18px)",
       }}>
-        <div className="bg-black/40 rounded-2xl shadow-2xl w-[1200px] min-h-[820px] relative text-white my-6">
+        <div className="bg-black/40 rounded-2xl shadow-2xl w-[1200px] min-h-[820px] relative text-white my-6 mt-0">
           <div className="absolute left-0 top-0 bottom-0 z-20">
             <Sidebar
               open={sidebarOpen}
@@ -217,10 +206,10 @@ export default function App() {
             />
           </div>
 
-          <main className="absolute top-0 right-0 bottom-0 overflow-auto px-6 py-4" style={{ left: sidebarOpen ? 256 : 64 }}>
-            <div style={{ height: 40 }} />
+          <main className="absolute top-0 right-0 bottom-0 overflow-auto px-6 py-4 mb-70" style={{ left: sidebarOpen ? 256 : 64 }}>
+            
 
-            <div className="mt-4">
+            <div className="mt-8">
               {page === "history" && <HistoryPage onPlay={(t) => playTrack(t)} />}
               {page === "settings" && (
                 <SettingsPage
@@ -233,7 +222,7 @@ export default function App() {
 
               {page === "library" && (
                 <>
-                  {/* Se houver texto na busca, mostra resultados de busca */}
+              
                   {search.trim().length > 0 ? (
                     <div className="p-4">
                       <h2 className="text-xl font-semibold mb-3">Resultados da busca para "{search}"</h2>

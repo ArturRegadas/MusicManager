@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Glass } from "../layout/Glass";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
@@ -37,6 +37,7 @@ export function SettingsPage({ path, onChangePath }: Props) {
     setBusy(true);
     try {
       await invoke("clear_play_history");
+      window.dispatchEvent(new Event("play-history-cleared"));
     } catch (err) {
       console.error("Erro ao limpar histórico:", err);
     }
@@ -101,3 +102,5 @@ export function SettingsPage({ path, onChangePath }: Props) {
     </div>
   );
 }
+
+export default SettingsPage;

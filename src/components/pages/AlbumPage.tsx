@@ -1,5 +1,4 @@
-import React from "react";
-import { ImageWithFallback } from "../ui/ImageWithFallback";
+import { ImageWithFallback } from "../ui/ImageWithFallBack";
 
 type Track = {
   id?: number | string;

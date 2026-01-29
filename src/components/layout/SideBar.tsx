@@ -24,7 +24,7 @@ export function Sidebar({ open, onToggle, search, onSearchChange, onSearchSubmit
         open ? "w-64 p-6" : "w-16 p-2"
       } bg-black/50 backdrop-blur-2xl border-r border-white/10 shadow-lg`}
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 mt-6">
         {open && <h2 className="text-xl font-bold select-none">Music Manager</h2>}
         <Button size="icon" variant="ghost" onClick={onToggle}>
           {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}

@@ -103,3 +103,14 @@ pub async fn get_play_history() -> Result<Vec<PlayEntry>, String> {
 
     Ok(result)
 }
+
+#[tauri::command]
+pub async fn clear_play_history() -> Result<(), String> {
+    let _ = tauri::async_runtime::spawn_blocking(move || {
+        if let Ok(conn) = connection::open_db() {
+            let _ = conn.execute("DELETE FROM play_history", []);
+        }
+    }).await.map_err(|e| e.to_string())?;
+
+    Ok(())
+}

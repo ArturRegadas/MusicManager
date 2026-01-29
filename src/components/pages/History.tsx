@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Glass } from "../layout/Glass";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -34,6 +34,15 @@ export function HistoryPage({ onPlay }: Props) {
 
   useEffect(() => {
     load();
+
+    const handler = () => {
+      load();
+    };
+    window.addEventListener("play-history-cleared", handler);
+
+    return () => {
+      window.removeEventListener("play-history-cleared", handler);
+    };
   }, []);
 
   return (
@@ -80,3 +89,5 @@ export function HistoryPage({ onPlay }: Props) {
     </div>
   );
 }
+
+export default HistoryPage;

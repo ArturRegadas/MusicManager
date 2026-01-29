@@ -2,7 +2,7 @@ import { Play, Pause, SkipForward, SkipBack } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Glass } from "../layout/Glass";
-import { ImageWithFallback } from "../ui/ImageWithFallback";
+import { ImageWithFallback } from "../ui/ImageWithFallBack";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -22,8 +22,14 @@ type Props = {
 
 export function Player({ currentTrack, onPrev, onNext }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const onNextRef = useRef<Props["onNext"]>();
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    onNextRef.current = onNext;
+  }, [onNext]);
+
 
   useEffect(() => {
     const audio = new Audio();
@@ -35,13 +41,19 @@ export function Player({ currentTrack, onPrev, onNext }: Props) {
       }
     };
 
+    const handleEnded = () => {
+      setPlaying(false);
+      onNextRef.current?.();
+    };
+
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("play", () => setPlaying(true));
     audio.addEventListener("pause", () => setPlaying(false));
-    audio.addEventListener("ended", () => setPlaying(false));
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
       audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("ended", handleEnded);
       audio.pause();
       audio.src = "";
     };
@@ -53,27 +65,24 @@ export function Player({ currentTrack, onPrev, onNext }: Props) {
     try {
       const assetUrl = convertFileSrc(currentTrack.path);
       const audio = audioRef.current;
+
       audio.src = assetUrl;
       audio.load();
       setProgress(0);
 
       audio.play().catch((err) => console.warn("Autoplay bloqueado:", err));
 
-      // registra no histórico (comando Tauri)
-      try {
-        invoke("add_play_history", {
-          title: currentTrack.title ?? "",
-          artist: currentTrack.artist ?? "",
-          album: currentTrack.album ?? null,
-          cover: currentTrack.cover ?? null,
-          path: currentTrack.path ?? ""
-        }).catch(e => console.warn("Não foi possível gravar histórico:", e));
-      } catch (err) {
-        console.warn("Erro ao invocar add_play_history:", err);
-      }
+  
+      invoke("add_play_history", {
+        title: currentTrack.title ?? "",
+        artist: currentTrack.artist ?? "",
+        album: currentTrack.album ?? null,
+        cover: currentTrack.cover ?? null,
+        path: currentTrack.path ?? ""
+      }).catch(e => console.warn("Não foi possível gravar histórico:", e));
 
     } catch (err) {
-      console.error("Erro ao carregar a música via Asset Protocol:", err);
+      console.error("Erro ao carregar música:", err);
     }
   }, [currentTrack]);
 
@@ -89,7 +98,7 @@ export function Player({ currentTrack, onPrev, onNext }: Props) {
     } catch (err) {
       console.error("Erro ao controlar reprodução:", err);
     }
-  }
+  };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current?.duration) return;
@@ -113,8 +122,8 @@ export function Player({ currentTrack, onPrev, onNext }: Props) {
           {currentTrack?.artist ?? "Artista desconhecido"}
         </p>
 
-        <div 
-          className="relative mt-3 h-4 flex items-center cursor-pointer" 
+        <div
+          className="relative mt-3 h-4 flex items-center cursor-pointer"
           onClick={handleSeek}
         >
           <div className="absolute w-full h-[3px] bg-white/20 rounded" />
@@ -130,9 +139,9 @@ export function Player({ currentTrack, onPrev, onNext }: Props) {
           <SkipBack size={18} />
         </Button>
 
-        <Button 
-          onClick={togglePlay} 
-          size="icon" 
+        <Button
+          onClick={togglePlay}
+          size="icon"
           className="w-12 h-12 rounded-full flex-shrink-0"
           disabled={!currentTrack}
         >

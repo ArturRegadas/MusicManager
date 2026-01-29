@@ -1,5 +1,4 @@
-import React from "react";
-import { ImageWithFallback } from "../ui/ImageWithFallback";
+import { ImageWithFallback } from "../ui/ImageWithFallBack";
 
 type Track = {
   id?: number | string;
@@ -35,7 +34,6 @@ export function ArtistPage({ artist, onOpenAlbum, onPlay, onBack }: Props) {
 
   const artistImage = artist.image ?? (artist.albums?.[0]?.image ?? undefined);
 
-  // keep album image as cover for songs when possible
   const topSongs = (artist.albums ?? []).flatMap(a =>
     (a.tracks ?? []).slice(0, 3).map(t => ({
       ...t,
